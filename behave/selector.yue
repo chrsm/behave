@@ -1,0 +1,22 @@
+import "behave.node" as Node
+
+--[[
+  Selector is a group of nodes that run until the first success.
+]]
+class Selector extends Node
+  new: (name, nodes = {}) =>
+    super name
+
+    @nodes = nodes
+
+  run: (...) =>
+    @state = Node.status.failure
+
+    for i, v in ipairs @nodes
+      status = v\run ...
+
+      if status == Node.status.success
+        @state = Node.status.success
+        break
+
+    @state

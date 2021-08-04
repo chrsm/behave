@@ -1,0 +1,14 @@
+import "behave.node" as Node
+
+--[[
+  Leaf is a single unit of work. It can be a part of a group of nodes or by itself.
+
+  Leaves can be decorated with a Repeater, Inverter, or AlwaysSuccess.
+]]
+class Leaf extends Node
+  new: (name, func) =>
+    super name
+    @func = func
+
+  run: (...) =>
+    self.func ...

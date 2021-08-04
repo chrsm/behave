@@ -1,0 +1,50 @@
+import "behave.node" as Node
+import "behave.leaf" as Leaf
+import "behave.sequence" as Sequence
+
+describe "sequence node", ->
+  it "should run multiple nodes", ->
+    l1r, l2r, l3r = false, false, false
+
+    l1 = Leaf "seq-test-01-leaf-01", ->
+      l1r = true
+      Node.status.success
+    l2 = Leaf "seq-test-01-leaf-02", ->
+      l2r = true
+      Node.status.success
+    l3 = Leaf "seq-test-01-leaf-03", ->
+      l3r = true
+      Node.status.success
+
+    seq = Sequence "seq-test-01", {
+      l1, l2, l3,
+    }
+
+    seq\run!
+    assert.is.true l1r
+    assert.is.true l2r
+    assert.is.true l3r
+
+  it "should stop at the first unsuccessful node", ->
+    l1r, l2r, l3r = false, false, false
+
+    l1 = Leaf "seq-test-01-leaf-01", ->
+      l1r = true
+      Node.status.success
+    l2 = Leaf "seq-test-01-leaf-02", ->
+      l2r = true
+      Node.status.failure
+    l3 = Leaf "seq-test-01-leaf-03", ->
+      l3r = true
+      Node.status.success
+
+    seq = Sequence "seq-test-01", {
+      l1, l2, l3,
+    }
+
+    state = seq\run!
+    assert.is.true l1r
+    assert.is.true l2r
+    assert.is.false l3r
+    assert.is.equal Node.status.failure, state
+

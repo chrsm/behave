@@ -1,0 +1,14 @@
+--
+cpkg = (...)\gsub('%.init$', '') .. "."
+
+behave =
+  Behavior: require("#{cpkg}behavior"),
+
+  Node: require("#{cpkg}node"),
+  Leaf: require("#{cpkg}leaf"),
+  Selector: require("#{cpkg}selector"),
+  Sequence: require("#{cpkg}sequence"),
+
+  Decorators: require("#{cpkg}decorators"),
+
+behave

@@ -1,0 +1,38 @@
+import insert from table
+
+import "behave.node" as Node
+
+--
+class Behavior
+  new: (name, nodes = {}) =>
+    @name = name
+    @nodes = nodes
+    @state = {}
+
+  add: (node) =>
+    insert @nodes, node
+
+  -- reset invalidates the current state set.
+  reset: =>
+    @state = {}
+
+  -- getStatus returns the last-known result of execution from a given node.
+  --
+  -- If the node has not been executed, we check each node of the tree and
+  -- ask for a status (which may subsequently check further down).
+  --
+  -- If nothing has been found, we return the `unknown` status.
+  getStatus: (node) =>
+    if @state[node]
+      return @state[node]
+
+    Node.status.unknown
+
+  -- run executes all nodes, passing any arguments to each node.
+  --
+  -- It tracks the result of each node.
+  --
+  -- Node groups (Selector, Sequence) should track their own state.
+  run: (...) =>
+    for i, v in ipairs @nodes
+      @state[v] = v\run ...

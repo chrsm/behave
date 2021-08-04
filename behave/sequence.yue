@@ -1,0 +1,21 @@
+import "behave.node" as Node
+
+--[[
+  Sequence is a group of nodes that run until the first failure.
+]]
+class Sequence extends Node
+  new: (name, nodes = {}) =>
+    super name
+
+    @nodes = nodes
+
+  run: (...) =>
+    @state = Node.status.success
+    for i, v in ipairs @nodes
+      status = v\run ...
+
+      if status == Node.status.failure
+        @state = Node.status.failure
+        break
+
+    @state

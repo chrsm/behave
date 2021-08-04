@@ -1,0 +1,40 @@
+import "behave.node" as Node
+
+class Decorator
+  new: (node) =>
+    @node = node
+
+  run: (...) =>
+    @node\run ...
+
+export class Invert extends Decorator
+  @invert = {
+    [Node.status.failure]: Node.status.success,
+    [Node.status.success]: Node.status.failure,
+  }
+
+  run: (...) =>
+    status = super ...
+
+    @@invert[status]
+
+export class Succeed extends Decorator
+  run: (...) =>
+    super ...
+
+    Node.status.success
+
+export class Until extends Decorator
+  new: (node, cond) =>
+    super node
+
+    assert type(cond) == "function", "must provide a condition function"
+    @cond = cond
+
+  run: (...) =>
+    local status
+    while not self.cond!
+      status = super ...
+
+    status
+

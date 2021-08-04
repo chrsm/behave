@@ -1,0 +1,16 @@
+-- Node is a "base" for all executable Behavior nodes.
+class Node
+  @status: {
+    unknown: 0,
+    failure: 1,
+    success: 2,
+    defer:   3,
+  }
+
+  new: (name) =>
+    @name = name
+    @state = Node.status.unknown
+
+  run: =>
+    Node.status.unknown
+

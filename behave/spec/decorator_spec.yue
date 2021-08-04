@@ -1,0 +1,56 @@
+import "behave.decorators" as :Invert, :Succeed, :Until
+import "behave.node" as Node
+import "behave.leaf" as Leaf
+
+describe "decorator", ->
+  describe "invert", ->
+    it "should return success for a failure", ->
+      l = Leaf "invert-test-01", ->
+        Node.status.failure
+
+      inv = Invert l
+      status = inv\run!
+
+      assert.is.equal Node.status.success, status
+
+    it "should return failure for a success", ->
+      l = Leaf "invert-test-02", ->
+        Node.status.success
+
+      inv = Invert(l)
+      status = inv\run!
+
+      assert.is.equal Node.status.failure, status
+
+  describe "succeed", ->
+    it "should cause a node to always succeed", ->
+      l = Leaf "succeed-test-02", ->
+        Node.status.failure
+
+      s = Succeed l
+      assert.is.equal Node.status.success, s\run!
+
+      l = Leaf "succeed-test-02", ->
+        "not-a-valid-status :("
+
+      s = Succeed l
+      assert.is.equal Node.status.success, s\run!
+
+  describe "until", ->
+    it "should repeat until condition met", ->
+      it = 0
+      runs = 0
+      cond = () ->
+        it += 1
+
+        it > 5
+
+      l = Leaf "until-test-01", ->
+        runs += 1
+        if it == 5 then Node.status.success else Node.status.failure
+
+      u = Until l, cond
+      assert.is.equal Node.status.success, u\run!
+      -- cond doesn't stop, but execution does.
+      assert.is.equal 6, it
+      assert.is.equal 5, runs

@@ -1,0 +1,49 @@
+import "behave.leaf" as Leaf
+import "behave.behavior" as Behavior
+import "behave.node" as Node
+
+describe "behavior tree", ->
+  it "should run a leaf node", ->
+    run = false
+    l = Leaf "node1", (v) ->
+      run = true
+
+      Node.status.failure
+
+    bt = Behavior "test1", { l }
+    bt\run!
+
+    assert.is.true run
+
+  it "should not track unknown node states", ->
+    unknode = {}
+    bt = Behavior "test1"
+    assert.is.equal Node.status.unknown, bt\getStatus(unknode)
+
+  it "should track node state", ->
+    l = Leaf "node1", (v) ->
+      if v == "some-value"
+        return Node.status.success
+
+      Node.status.failure
+
+    bt = Behavior "test1", { l }
+    assert.is.equal Node.status.unknown, bt\getStatus(l)
+
+    bt\run!
+    assert.is.equal Node.status.failure, bt\getStatus(l)
+
+    bt\run "some-value"
+    assert.is.equal Node.status.success, bt\getStatus(l)
+
+  it "should allow state reset", ->
+    l = Leaf "node1", () -> Node.status.success
+
+    bt = Behavior "test1", { l }
+    bt\run!
+    assert.is.equal Node.status.success, bt\getStatus(l)
+
+    bt\reset!
+    assert.is.equal Node.status.unknown, bt\getStatus(l)
+
+    nil
