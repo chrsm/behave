@@ -33,7 +33,7 @@ export class Until extends Decorator
 
   run: (...) =>
     local status
-    while not self.cond!
+    while not @.cond!
       status = super ...
 
     status
